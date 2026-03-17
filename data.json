@@ -1,0 +1,12 @@
+{
+  "videoFolder": "videos",
+  "useRelativePath": true,
+  "ytDlpPath": "C:\\tools\\ffmpeg-master-latest-win64-gpl-shared\\bin\\yt-dlp.exe",
+  "maxFileSize": "100m",
+  "preferredFormat": "mp4",
+  "maxHeight": "1080",
+  "autoDownloadOnSave": false,
+  "autoDownloadOnCreate": true,
+  "noPlaylist": true,
+  "replaceLinks": true
+}

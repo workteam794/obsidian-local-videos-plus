@@ -304,7 +304,16 @@ class LocalVideosPlusPlugin extends obsidian.Plugin {
       try {
         const localPath = await this.downloadVideo(url, absSaveDir, file, vaultBase);
         if (localPath && this.settings.replaceLinks) {
-          content = content.split(url).join(`![[${localPath}]]`);
+          const embed = `![[${localPath}]]`;
+          const escapedUrl = url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          // 替换所有包含此 URL 的 Markdown 语法：
+          // [文字](URL)  →  ![[local]]
+          // (URL)        →  ![[local]]
+          // URL 裸链接   →  ![[local]]
+          content = content
+            .replace(new RegExp(`\\[[^\\]]*\\]\\(${escapedUrl}[^)]*\\)`, "g"), embed)
+            .replace(new RegExp(`\\(${escapedUrl}[^)]*\\)`, "g"), embed)
+            .replace(new RegExp(escapedUrl, "g"), embed);
         }
         ok++;
         console.log(`[LVP] ✅ ${url} → ${localPath}`);
