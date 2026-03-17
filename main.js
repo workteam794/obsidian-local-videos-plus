@@ -297,7 +297,7 @@ class LocalVideosPlusPlugin extends obsidian.Plugin {
     const absSaveDir = path.join(vaultBase, saveDir);
     if (!fs.existsSync(absSaveDir)) fs.mkdirSync(absSaveDir, { recursive: true });
 
-    let ok = 0, fail = 0;
+    let ok = 0, fail = 0, skip = 0;
 
     for (const url of urls) {
       if (!url.startsWith("http")) continue;
@@ -309,8 +309,21 @@ class LocalVideosPlusPlugin extends obsidian.Plugin {
         ok++;
         console.log(`[LVP] ✅ ${url} → ${localPath}`);
       } catch (e) {
-        fail++;
-        console.error(`[LVP] ❌ ${url}`, e.message || e);
+        const msg = e.message || "";
+        // 以下情况属于正常跳过，不计入失败
+        if (
+          msg.includes("No video formats found") ||   // 帖子没有视频（只有图片/文字）
+          msg.includes("No media") ||
+          msg.includes("This tweet is not available") ||
+          msg.includes("does not exist") ||
+          msg.includes("max-filesize")                // 超过大小限制
+        ) {
+          skip++;
+          console.log(`[LVP] ⏭️ 跳过（无视频或超限）: ${url}`);
+        } else {
+          fail++;
+          console.error(`[LVP] ❌ ${url}`, msg);
+        }
       }
     }
 
@@ -319,9 +332,11 @@ class LocalVideosPlusPlugin extends obsidian.Plugin {
     }
 
     if (showNotice || ok > 0 || fail > 0) {
-      new obsidian.Notice(
-        `🎉 完成！成功 ${ok} 个${fail > 0 ? `，失败 ${fail} 个（见控制台）` : ""}`
-      );
+      const parts = [];
+      if (ok > 0) parts.push(`成功 ${ok} 个`);
+      if (skip > 0) parts.push(`跳过 ${skip} 个（无视频）`);
+      if (fail > 0) parts.push(`失败 ${fail} 个（见控制台）`);
+      if (parts.length > 0) new obsidian.Notice(`🎉 完成！${parts.join("，")}`);
     }
   }
 
