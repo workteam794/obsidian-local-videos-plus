@@ -299,6 +299,16 @@ class LocalVideosPlusPlugin extends obsidian.Plugin {
 
     let ok = 0, fail = 0, skip = 0;
 
+    // 把 frontmatter 和正文分开，只替换正文部分，保留 frontmatter 原始 URL
+    // 兼容 \n 和 \r\n 两种换行符
+    let frontmatter = "";
+    let body = content;
+    const fmMatch = content.match(/^(---\r?\n[\s\S]*?\r?\n---\r?\n)([\s\S]*)$/);
+    if (fmMatch) {
+      frontmatter = fmMatch[1];
+      body = fmMatch[2];
+    }
+
     for (const url of urls) {
       if (!url.startsWith("http")) continue;
       try {
@@ -306,11 +316,8 @@ class LocalVideosPlusPlugin extends obsidian.Plugin {
         if (localPath && this.settings.replaceLinks) {
           const embed = `![[${localPath}]]`;
           const escapedUrl = url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-          // 替换所有包含此 URL 的 Markdown 语法：
-          // [文字](URL)  →  ![[local]]
-          // (URL)        →  ![[local]]
-          // URL 裸链接   →  ![[local]]
-          content = content
+          // 只替换正文里的链接，frontmatter 不动
+          body = body
             .replace(new RegExp(`\\[[^\\]]*\\]\\(${escapedUrl}[^)]*\\)`, "g"), embed)
             .replace(new RegExp(`\\(${escapedUrl}[^)]*\\)`, "g"), embed)
             .replace(new RegExp(escapedUrl, "g"), embed);
@@ -337,7 +344,7 @@ class LocalVideosPlusPlugin extends obsidian.Plugin {
     }
 
     if (this.settings.replaceLinks && ok > 0) {
-      await this.app.vault.modify(file, content);
+      await this.app.vault.modify(file, frontmatter + body);
     }
 
     if (showNotice || ok > 0 || fail > 0) {
