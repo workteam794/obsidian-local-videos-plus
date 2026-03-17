@@ -1,0 +1,11 @@
+{
+  "id": "local-videos-plus",
+  "name": "Local Videos Plus",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Automatically download videos from URLs in your notes using yt-dlp. Supports YouTube, Bilibili, Twitter/X, Reddit, TikTok, Instagram and 1800+ sites.",
+  "author": "Community Plugin",
+  "authorUrl": "",
+  "fundingUrl": "",
+  "isDesktopOnly": true
+}
