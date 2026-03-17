@@ -1,6 +1,6 @@
 # Local Videos Plus
 
-Obsidian 插件 — 自动下载笔记中的视频链接到本地，类似 **Local Images Plus**，底层调用 **yt-dlp**。
+Obsidian 插件 — 自动下载笔记中的视频链接到本地，类似 **Local Images Plus**，底层调用 **yt-dlp**。需要安装yt-dlp和ffmpeg，yt-dlp下载视频，ffmpeg把视频片段合并成一个视频。
 
 ---
 
